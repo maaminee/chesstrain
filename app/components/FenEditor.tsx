@@ -1,12 +1,24 @@
 import { Chess, Move } from "@jackstenglein/chess";
-import { parse } from "@mliebelt/pgn-parser";
-import { stringify } from "querystring";
 import { Dispatch, JSX, SetStateAction } from "react";
+import MoveCard from "./moveUtils/moveCard";
 
-const FenEditor = ({ pgn }: { pgn: string }) => {
+const FenEditor = ({
+  pgn,
+  selectedMove,
+  setSelectedMove,
+}: {
+  pgn: string;
+  selectedMove: Move | null;
+  setSelectedMove: Dispatch<SetStateAction<Move | null>>;
+}) => {
   const game = new Chess();
   game.loadPgn(pgn);
   const Moves = game.pgn.history.moves;
+
+  function onCardClick(move: Move) {
+    setSelectedMove(move);
+    game.loadPgn(game.renderLine(move));
+  }
 
   const renderMoves = (move: Move[]): JSX.Element[] => {
     if (!move) return [];
@@ -14,15 +26,7 @@ const FenEditor = ({ pgn }: { pgn: string }) => {
     const moves: JSX.Element[] = [];
 
     while (move[i]) {
-      moves.push(
-        <div
-          key={move[i].san}
-          className="text-center"
-          style={{ marginBottom: "5px" }}
-        >
-          <strong>{move[i].san}</strong>
-        </div>
-      );
+      moves.push(<MoveCard onClick={onCardClick} move={move[i]} />);
       move[i].variations.forEach((element) => {
         moves.push(...renderMoves(element));
       });

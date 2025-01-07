@@ -1,15 +1,22 @@
+import { Move } from "@jackstenglein/chess";
 import React from "react";
-import { Move } from "./moveType";
 
 type MoveCardProps = {
   move: Move;
-  onClick: (fen: string) => void; // Fonction pour mettre à jour l'échiquier
+  onClick: (move: Move) => void;
 };
 
 const MoveCard: React.FC<MoveCardProps> = ({ move, onClick }) => {
   return (
-    <div onClick={() => onClick(move.fen)} className="move-card">
-      {move.san}
+    <div
+      onClick={() => {
+        onClick(move);
+      }}
+      key={move.san}
+      className="text-center"
+      style={{ marginBottom: "5px" }}
+    >
+      <strong>{move.san}</strong>
     </div>
   );
 };
