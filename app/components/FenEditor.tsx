@@ -3,21 +3,22 @@ import { Dispatch, JSX, SetStateAction } from "react";
 import MoveCard from "./moveUtils/moveCard";
 
 const FenEditor = ({
-  pgn,
+  chessGameState,
   selectedMove,
   setSelectedMove,
+  setChessGameState,
 }: {
-  pgn: string;
+  chessGameState: Chess;
+  setChessGameState: Dispatch<SetStateAction<Chess>>;
   selectedMove: Move | null;
   setSelectedMove: Dispatch<SetStateAction<Move | null>>;
 }) => {
-  const game = new Chess();
-  game.loadPgn(pgn);
-  const Moves = game.pgn.history.moves;
+  const Moves = chessGameState.pgn.history.moves;
 
   function onCardClick(move: Move) {
     setSelectedMove(move);
-    game.loadPgn(game.renderLine(move));
+    chessGameState.loadPgn(chessGameState.renderLine(move));
+    setChessGameState(chessGameState);
   }
 
   const renderMoves = (move: Move[]): JSX.Element[] => {
@@ -38,7 +39,11 @@ const FenEditor = ({
 
   return (
     <div className="gap-12 grid grid-cols-2">
-      {game.firstMove() ? renderMoves(Moves) : <p>Aucun coup à afficher</p>}
+      {chessGameState.firstMove() ? (
+        renderMoves(Moves)
+      ) : (
+        <p>Aucun coup à afficher</p>
+      )}
     </div>
   );
 };
