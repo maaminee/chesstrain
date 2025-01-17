@@ -17,20 +17,38 @@ const FenEditor = ({
 
   function onCardClick(move: Move) {
     setSelectedMove(move);
-    chessGameState.loadPgn(chessGameState.renderLine(move));
+    chessGameState.seek(move);
     setChessGameState(chessGameState);
   }
 
-  const renderMoves = (move: Move[]): JSX.Element[] => {
+  const renderMoves = (
+    move: Move[],
+    isMainLine: boolean = true
+  ): JSX.Element[] => {
     if (!move) return [];
     let i = 0;
     const moves: JSX.Element[] = [];
 
     while (move[i]) {
-      moves.push(<MoveCard onClick={onCardClick} move={move[i]} />);
-      move[i].variations.forEach((element) => {
-        moves.push(...renderMoves(element));
-      });
+      moves.push(
+        <MoveCard
+          key={move[i].san}
+          isMainLine={isMainLine}
+          onClick={onCardClick}
+          move={move[i]}
+        />
+      );
+      if (move[i + 1]) {
+        move[i + 1].variations.forEach((element) => {
+          moves.push(
+            <div className="block w-full">
+              <div className="w-full bg-gray-400 flex flex-wrap gap-3 pl-4 align-middle">
+                {...renderMoves(element, false)}
+              </div>
+            </div>
+          );
+        });
+      }
 
       i++;
     }
@@ -38,7 +56,7 @@ const FenEditor = ({
   };
 
   return (
-    <div className="gap-12 grid grid-cols-2">
+    <div className="flex flex-wrap">
       {chessGameState.firstMove() ? (
         renderMoves(Moves)
       ) : (

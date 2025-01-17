@@ -11,10 +11,12 @@ function StockfishAnalysis({ currentFen }: { currentFen: string }) {
 
   useEffect(() => {
     setLoading(true);
-    const engine = new Worker("./stockfish-16.1.js");
+    const engine = new Worker("./stockfish-16.1-lite.js");
 
     engine.postMessage("setoption name WebAssembly value true");
-    engine.postMessage('setoption name wasm path value "/stockfish-16.1.wasm"');
+    engine.postMessage(
+      'setoption name wasm path value "/stockfish-16.1-lite.wasm"'
+    );
     // Initialisation de Stockfish avec la position FEN
     engine.postMessage("setoption name MultiPV value 5"); // Demander 5 variantes
     engine.postMessage(`position fen ${currentFen}`);
@@ -22,7 +24,7 @@ function StockfishAnalysis({ currentFen }: { currentFen: string }) {
     engine.onmessage = (event) => {
       const depth = event.data.match(/depth (\d+)/);
 
-      if (!depth || depth < 5) {
+      if (!depth) {
         return;
       }
       setShowedDepth(depth[1]);
